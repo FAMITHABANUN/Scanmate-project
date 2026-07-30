@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - ScanMate{% endblock %}
+{% block content %}
+<section class="dashboard">
+    <h2>👋 Hi {{ session.user_name }}, ready to scan something?</h2>
+
+    <div class="upload-card">
+        <form method="POST" action="{{ url_for('scan') }}" enctype="multipart/form-data" id="scanForm">
+            <label class="upload-label">
+                📷 Scan a handwritten page (English &amp; Tamil supported)
+            </label>
+
+            <!-- Hidden inputs: one opens the camera directly, one opens the file picker -->
+            <input type="file" id="cameraInput" name="camera_image" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="fileInput" name="file_image" accept="image/png, image/jpeg, image/webp" style="display:none;">
+
+            <div class="upload-buttons">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('cameraInput').click()">📸 Use Camera</button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">🗂️ Choose File</button>
+            </div>
+
+            <div id="previewWrap" style="display:none;">
+                <img id="previewImg" alt="Selected image preview">
+                <p id="previewName" class="preview-name"></p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="scanSubmitBtn" style="display:none;">🔍 Scan Now</button>
+        </form>
+    </div>
+
+    <script>
+        function handleFileSelect(file) {
+            if (!file) return;
+            const preview = document.getElementById('previewWrap');
+            const img = document.getElementById('previewImg');
+            const name = document.getElementById('previewName');
+            img.src = URL.createObjectURL(file);
+            name.innerText = file.name;
+            preview.style.display = 'block';
+            document.getElementById('scanSubmitBtn').style.display = 'inline-block';
+        }
+
+        document.getElementById('cameraInput').addEventListener('change', function () {
+            // Camera photo selected -> deactivate the other input so only one gets submitted
+            document.getElementById('fileInput').value = '';
+            handleFileSelect(this.files[0]);
+        });
+        document.getElementById('fileInput').addEventListener('change', function () {
+            document.getElementById('cameraInput').value = '';
+            handleFileSelect(this.files[0]);
+        });
+    </script>
+
+    <h3 class="history-heading">🗂️ Your Scans</h3>
+    {% if scans %}
+        <div class="scan-list">
+            {% for scan in scans %}
+                <a href="{{ url_for('view_scan', scan_id=scan['id']) }}" class="scan-item">
+                    <span class="scan-category cat-{{ scan['category'] }}">{{ scan['category'].replace('_', ' ') }}</span>
+                    <span class="scan-preview">{{ scan['extracted_text'][:80] or 'No text detected' }}{% if scan['extracted_text'] and scan['extracted_text']|length > 80 %}...{% endif %}</span>
+                    <span class="scan-date">{{ scan['created_at'][:10] }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">📭 No scans yet - upload your first handwritten page above.</p>
+    {% endif %}
+</section>
+{% endblock %}

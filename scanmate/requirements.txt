@@ -1,0 +1,7 @@
+Flask==3.0.3
+Werkzeug==3.0.3
+google-genai==1.20.0
+Pillow==11.0.0
+fpdf2==2.7.9
+python-dotenv==1.0.1
+gunicorn==22.0.0

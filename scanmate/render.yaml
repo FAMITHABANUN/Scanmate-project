@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: scanmate
+    env: docker
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: APP_URL
+        sync: false

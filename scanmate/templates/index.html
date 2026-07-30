@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}ScanMate - Share Notes, Save Time{% endblock %}
+{% block content %}
+<section class="hero">
+    <p class="hero-tag">HERO SECTION</p>
+    <h1 class="hero-title"><img src="{{ url_for('static', filename='images/favicon.svg') }}" alt="ScanMate logo" class="hero-logo"> SCAN<span>MATE</span> ✨</h1>
+    <p class="hero-sub">Any Handwritten Page, Instantly Digital</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">🚀 Get Started Free</a>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">👋 I have an account</a>
+    </div>
+    <div class="hero-image">
+        <img src="{{ url_for('static', filename='images/robot-with-tablet.png') }}" alt="ScanMate AI assistant holding a tablet showing the ScanMate homepage">
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-heading">📌 What You Can Scan</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>📚 Study Notes</h3>
+            <p>Class notes, textbook pages, revision notes - turned into clean text.</p>
+        </div>
+        <div class="feature-card">
+            <h3>💻 Programming Notes</h3>
+            <p>Handwritten pseudocode or logic? Get quick tips on structure and clarity.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🛒 Grocery Lists</h3>
+            <p>Snap your list, get it organized and ready to shop from.</p>
+        </div>
+        <div class="feature-card">
+            <h3>✅ To-Do Lists</h3>
+            <p>Digitize daily tasks and get help prioritizing what matters.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🧾 Bills &amp; Invoices</h3>
+            <p>Keep a searchable digital record of handwritten bills.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📝 Anything Else</h3>
+            <p>If it's handwritten, ScanMate can read it.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2 class="section-heading">⚙️ How It Works</h2>
+    <div class="steps">
+        <div class="step"><span class="step-num">1</span><p>📷 Scan or upload a photo of your handwritten page</p></div>
+        <div class="step"><span class="step-num">2</span><p>🔤 ScanMate converts it into clean digital text</p></div>
+        <div class="step"><span class="step-num">3</span><p>🤖 Our assistant asks: "Can I help you with this?"</p></div>
+        <div class="step"><span class="step-num">4</span><p>💡 Say yes, and get tips tailored to what you scanned</p></div>
+    </div>
+</section>
+
+<section class="meet-ai-outer">
+    <div class="meet-ai-card meet-ai-card-full">
+        <h2 class="section-heading" style="margin-top:0;">🤖 Meet Your Study Buddy</h2>
+        <p>Every scan comes with a friendly assistant standing by. It reads what you scanned, offers relevant tips, and answers specific questions pulled straight from your own notes — no generic advice, just help based on what you actually wrote.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">✨ Try it now</a>
+    </div>
+</section>
+{% endblock %}

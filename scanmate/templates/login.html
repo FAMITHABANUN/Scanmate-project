@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Login - ScanMate{% endblock %}
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h2>👋 Welcome Back</h2>
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn btn-primary btn-block">Log In</button>
+        </form>
+        <p class="auth-switch">New here? <a href="{{ url_for('register') }}">Create an account</a></p>
+    </div>
+</section>
+{% endblock %}

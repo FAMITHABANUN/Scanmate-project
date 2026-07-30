@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ScanMate{% endblock %}</title>
+    <meta name="description" content="ScanMate turns any handwritten page - notes, lists, bills - into clean digital text instantly, with a helpful AI assistant.">
+    <meta name="theme-color" content="#0a0b14">
+
+    <!-- Favicon (shows in browser tabs and, once Google re-crawls, in search results) -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/icon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='images/icon-192.png') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='images/icon-192.png') }}">
+
+    <!-- Social/share preview image -->
+    <meta property="og:title" content="ScanMate - Any Handwritten Page, Instantly Digital">
+    <meta property="og:description" content="Scan any handwritten page and get clean digital text, instantly, with a helpful AI assistant.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/icon-512.png', _external=True) }}">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand"><img src="{{ url_for('static', filename='images/favicon.svg') }}" alt="ScanMate logo" class="brand-logo" width="20" height="20"> Scan<span>Mate</span></a>
+        <div class="nav-links">
+            {% if session.user_id %}
+                <a href="{{ url_for('index', home=1) }}">🏡 Home</a>
+                <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+                <a href="{{ url_for('logout') }}">🚪 Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">🔑 Login</a>
+                <a href="{{ url_for('register') }}" class="btn-nav">✨ Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+       <p><img src="{{ url_for('static', filename='images/favicon.svg') }}" alt="ScanMate logo" class="footer-logo" width="14" height="14"> ScanMate &mdash; Turn any handwritten page into text, instantly. ✨</p>
+    </footer>
+</body>
+</html>

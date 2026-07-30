@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Scan Result - ScanMate{% endblock %}
+{% block content %}
+<section class="scan-result">
+    <a href="{{ url_for('dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+
+    <div class="result-header">
+        <h2><img src="{{ url_for('static', filename='images/favicon.svg') }}" alt="ScanMate logo" class="inline-logo"> Scan Result</h2>
+        <span class="scan-category cat-{{ scan['category'] }}">{{ category_label }}</span>
+    </div>
+
+    <div class="result-grid">
+        <div class="result-image">
+            <img src="{{ url_for('static', filename='uploads/' + scan['filename']) }}" alt="Uploaded scan">
+        </div>
+        <div class="result-text">
+            <h3>📝 Extracted Text</h3>
+            <pre id="extractedText">{{ scan['extracted_text'] or 'No text could be detected in this image.' }}</pre>
+            <div class="result-actions">
+                <button class="btn btn-secondary" onclick="copyText()">📋 Copy Text</button>
+                <a href="{{ url_for('download_scan', scan_id=scan['id'], fmt='image') }}" class="btn btn-secondary">🖼️ Download as Image</a>
+                <a href="{{ url_for('download_scan', scan_id=scan['id'], fmt='pdf') }}" class="btn btn-secondary">📕 Download as PDF</a>
+                <button class="btn btn-secondary" id="translateBtn" onclick="translateText({{ scan['id'] }})">🌐 Translate to English</button>
+            </div>
+            <div class="translation-box" id="translationBox" style="display:none;">
+                <h4>🌐 English Translation</h4>
+                <pre id="translationText"></pre>
+            </div>
+            {% if scan['extracted_text'] and scan['extracted_text']|length > 800 %}
+                <p class="download-hint">💡 This scan is fairly long - PDF will paginate it neatly. Image works best for shorter scans.</p>
+            {% else %}
+                <p class="download-hint">💡 This scan is short - Image gives a clean single snapshot. PDF works too if you prefer.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="assistant-box" id="assistantBox">
+        <div class="ai-orb" aria-hidden="true">
+            <span class="ai-orb-ring"></span>
+            <span class="ai-orb-core">✨</span>
+        </div>
+        <p id="assistantQuestion">I noticed this looks like <strong>{{ category_label }}</strong>. Can I help you with it?</p>
+        <div class="assistant-actions" id="assistantActions">
+            <button class="btn btn-primary" onclick="requestHelp({{ scan['id'] }})">✅ Yes, help me</button>
+            <button class="btn btn-secondary" onclick="dismissAssistant()">🙅 No thanks</button>
+        </div>
+        <div class="assistant-tips" id="assistantTips" style="display:none;"></div>
+
+        <div class="assistant-ask" id="assistantAsk" style="display:none;">
+            <label for="userQuestion">💬 Got something specific? Ask me:</label>
+            <div class="ask-row">
+                <input type="text" id="userQuestion" placeholder="e.g. why is my loop not stopping?">
+                <button class="btn btn-primary" onclick="askQuestion({{ scan['id'] }})">Ask</button>
+            </div>
+            <div class="assistant-answer" id="assistantAnswer"></div>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('delete_scan', scan_id=scan['id']) }}" class="delete-form"
+          onsubmit="return confirm('Delete this scan?');">
+        <button type="submit" class="btn btn-danger">🗑️ Delete Scan</button>
+    </form>
+</section>
+
+<script>
+function copyText() {
+    const text = document.getElementById('extractedText').innerText;
+    navigator.clipboard.writeText(text);
+    alert('Text copied to clipboard! 📋');
+}
+
+async function translateText(scanId) {
+    const btn = document.getElementById('translateBtn');
+    const box = document.getElementById('translationBox');
+    const textEl = document.getElementById('translationText');
+
+    btn.disabled = true;
+    box.style.display = 'block';
+    textEl.innerText = 'Translating... 🤔';
+
+    try {
+        const response = await fetch(`/scan/${scanId}/translate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_language: 'English' })
+        });
+        const data = await response.json();
+        textEl.innerText = data.translation;
+    } catch (err) {
+        textEl.innerText = "Couldn't reach the translator - try again?";
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function dismissAssistant() {
+    document.getElementById('assistantActions').style.display = 'none';
+    document.getElementById('assistantQuestion').innerText = "👍 No problem — your text is ready above whenever you need it.";
+}
+
+async function requestHelp(scanId) {
+    document.getElementById('assistantActions').style.display = 'none';
+    document.getElementById('assistantQuestion').innerText = "🤖 Here are a few quick tips:";
+
+    const response = await fetch(`/scan/${scanId}/help`, { method: 'POST' });
+    const data = await response.json();
+
+    const tipsDiv = document.getElementById('assistantTips');
+    tipsDiv.style.display = 'block';
+    tipsDiv.innerHTML = '<ul>' + data.tips.map(t => `<li>${t}</li>`).join('') + '</ul>';
+
+    document.getElementById('assistantAsk').style.display = 'block';
+}
+
+async function askQuestion(scanId) {
+    const input = document.getElementById('userQuestion');
+    const question = input.value.trim();
+    if (!question) return;
+
+    const answerDiv = document.getElementById('assistantAnswer');
+    answerDiv.innerText = "Thinking... 🤔";
+
+    const response = await fetch(`/scan/${scanId}/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+    });
+    const data = await response.json();
+    answerDiv.innerText = data.answer;
+    input.value = '';
+}
+</script>
+{% endblock %}
